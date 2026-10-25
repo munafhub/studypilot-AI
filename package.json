@@ -1,0 +1,19 @@
+{
+  "name": "studypilot-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StudyPilot AI - plan study tasks, import syllabi, get AI study plans, explanations and quizzes.",
+  "workspaces": ["server", "client"],
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "dev": "npm run dev --workspace server & npm run dev --workspace client",
+    "dev:server": "npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "start": "npm run start --workspace server",
+    "seed": "npm run seed --workspace server",
+    "sample-pdf": "npm run sample-pdf --workspace server",
+    "test": "npm run test --workspace server",
+    "test:coverage": "npm run test:coverage --workspace server"
+  }
+}
