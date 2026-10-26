@@ -21,5 +21,10 @@ export function loadConfig(env = process.env) {
     authRateLimit: { windowMs: 15 * 60 * 1000, max: num(env.AUTH_RATE_LIMIT, 30) },
     aiRateLimit: { windowMs: 10 * 60 * 1000, max: num(env.AI_RATE_LIMIT, 40) },
     maxPdfBytes: 5 * 1024 * 1024,
+    /** Frontend origins allowed to call this API cross-origin (comma separated, "*" = any). */
+    corsOrigins: (env.CORS_ORIGIN || '')
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean),
   };
 }

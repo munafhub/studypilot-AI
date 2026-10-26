@@ -1,5 +1,17 @@
 const TOKEN_KEY = 'studypilot_token';
 
+/**
+ * Where the API lives. Set VITE_API_URL (e.g. https://studypilot-ai.bonto.run) when the
+ * frontend is deployed separately from the backend. Leave it empty for same-origin "/api/...".
+ */
+const rawBase = import.meta.env?.VITE_API_URL || '';
+export const API_BASE = rawBase.replace(/\/+$/, '');
+
+function resolveUrl(path) {
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+}
+
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
 export const setToken = (t) => (t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY));
 
@@ -19,7 +31,7 @@ export class ApiError extends Error {
   }
 }
 
-async function request(method, url, { body, raw, contentType } = {}) {
+async function request(method, path, { body, raw, contentType } = {}) {
   const headers = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -33,9 +45,9 @@ async function request(method, url, { body, raw, contentType } = {}) {
   }
   let res;
   try {
-    res = await fetch(url, { method, headers, body: payload });
+    res = await fetch(resolveUrl(path), { method, headers, body: payload });
   } catch {
-    throw new ApiError(0, { error: { message: 'Cannot reach the server. Is it running?' } });
+    throw new ApiError(0, { error: { message: `Cannot reach the server at ${API_BASE || '(same origin)'}. Is it running?` } });
   }
   if (res.status === 204) return null;
   let data = null;

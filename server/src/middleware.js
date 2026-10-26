@@ -14,6 +14,31 @@ export function securityHeaders(req, res, next) {
   next();
 }
 
+/**
+ * CORS for deployments where the frontend and this API are on different origins
+ * (e.g. frontend on Vercel, backend on bonto.run). No-op unless CORS_ORIGIN is set.
+ */
+export function cors({ origins = [] } = {}) {
+  return (req, res, next) => {
+    if (origins.length) {
+      const origin = req.headers.origin;
+      if (origin) {
+        if (origins.includes('*')) {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+        } else if (origins.includes(origin)) {
+          res.setHeader('Access-Control-Allow-Origin', origin);
+          res.setHeader('Vary', 'Origin');
+        }
+      }
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Max-Age', '86400');
+      if (req.method === 'OPTIONS') return res.status(204).end();
+    }
+    next();
+  };
+}
+
 /** Fixed-window in-memory rate limiter. */
 export function rateLimit({ windowMs, max, keyFn, clock = Date.now }) {
   const hits = new Map();

@@ -1,7 +1,7 @@
 import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
-import { securityHeaders, requireAuth, rateLimit, errorHandler } from './middleware.js';
+import { securityHeaders, cors, requireAuth, rateLimit, errorHandler } from './middleware.js';
 import { authRoutes } from './routes/auth.js';
 import { settingsRoutes } from './routes/settings.js';
 import { taskRoutes } from './routes/tasks.js';
@@ -14,6 +14,7 @@ export function createApp({ db, config, llm, now = () => new Date(), logger = co
   const ctx = { db, config, llm, now, logger };
   const app = express();
   app.disable('x-powered-by');
+  app.use(cors({ origins: config.corsOrigins }));
   app.use(securityHeaders);
   app.use(express.json({ limit: '100kb' }));
 
