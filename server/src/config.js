@@ -21,10 +21,15 @@ export function loadConfig(env = process.env) {
     authRateLimit: { windowMs: 15 * 60 * 1000, max: num(env.AUTH_RATE_LIMIT, 30) },
     aiRateLimit: { windowMs: 10 * 60 * 1000, max: num(env.AI_RATE_LIMIT, 40) },
     maxPdfBytes: 5 * 1024 * 1024,
-    /** Frontend origins allowed to call this API cross-origin (comma separated, "*" = any). */
+    /**
+     * Frontend origins allowed to call this API cross-origin (comma separated, "*" = any).
+     * Defaults to allowing every origin so a separately hosted frontend (e.g. on Vercel)
+     * works without extra hosting config. Set CORS_ORIGIN on the host to restrict it.
+     */
     corsOrigins: (env.CORS_ORIGIN || '')
       .split(',')
       .map((o) => o.trim())
-      .filter(Boolean),
+      .filter(Boolean)
+      .concat(env.CORS_ORIGIN ? [] : ['*']),
   };
 }
